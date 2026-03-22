@@ -1,4 +1,4 @@
-# Predicting streetcar bunching risk-events
-## an ML approach to congestion on the TTC
+# Predicting streetcar bunching risk-events:
+## An ML approach to congestion on the TTC
 
 
