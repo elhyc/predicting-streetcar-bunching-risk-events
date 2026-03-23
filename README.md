@@ -44,7 +44,21 @@ Our prediction model will essentially use three "layers" of features.
 - The main feature dataframe that our models will be fit with is called ```incident_X```, which is a sub-dataframe of ```incident_df```, consisting of valid bunching episodes satisfying the current definition of "risk-pattern". 
 
 
+# Modeling overview
 
+For each risk-event type,  we use XGBoost as our model for our binary classification prediction task. For training and testing purposes, we use a time-sensitive train/validation/test split our of data set. The splits are given by: 
+
+- Training set: 2024/07/01 to 2025/09/30
+
+   - A single buffer day 
+
+- Validation set: 2025/10/01 to 2025/11/15
+
+  - A single buffer day
+
+- Test set: 2025/11/16 to 2026/03/11
+
+We do a 4-fold cross-validation scheme for model training.  A hyperparameter grid search is done to search for optimal XGboost hyperparameters. Depending on the skewed-ness of the specific type of risk-event, we may choose different metrics for assessing performance on validation sets. Generally speaking, as we are leaning towards recall rate, we consider F2-score, with possibly a cap on false positive rate.  
 
 
 # Data-loading
