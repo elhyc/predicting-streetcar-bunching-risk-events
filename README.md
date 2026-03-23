@@ -2,7 +2,7 @@
 ## An ML approach to congestion on the TTC
 
 
- Heuristically, streetcars are "bunched" when a pair of streetcars arrive at a stop in quick succession. The scheduled headway between streetcars is the time gap between sucessive streetcars, according to a fixed schedule. A "bunching incident" happens when the observed headway between two streetcars in reality ends up being a time gap that is much lower than the scheduled headway. While there is not a strict definition of how much sooner than the scheduled headway counts as a "bunching incident", it should be calculated as the scheduled headway multiplied by some scale factor <<  1. Here, we take this scale factor to be $1/2$, so that a bunching incident occurs when a streetcar arrives at a stop sooner than 50% of the scheduled headway.
+ Heuristically, streetcars are "bunched" when a pair of streetcars arrive at a stop in quick succession. The scheduled headway between streetcars is the time gap between sucessive streetcars, according to a fixed schedule. A "bunching incident" happens when the observed headway between two streetcars in reality ends up being a time gap that is much lower than the scheduled headway. While there is not a strict definition of how much sooner than the scheduled headway counts as a "bunching incident", it should be calculated as the scheduled headway multiplied by some scale factor <<  1. Here, we take this scale factor to be 1/2, so that a bunching incident occurs when a streetcar arrives at a stop sooner than 50% of the scheduled headway.
 
 ### <u> Bunching episodes </u> 
 
