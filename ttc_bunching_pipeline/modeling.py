@@ -64,18 +64,19 @@ def default_task_threshold_policy() -> dict[str, str]:
     return {
     "observed1_next2_gap1_binary": {'name': "f2", 'fpr_cap': 40},
     "observed2_next2_gap1_binary": {'name': "f2",'fpr_cap': 40},
-    # "observed2_next3_gap1_binary": {"name": "f2", 'fpr_cap': 30},
+    
+    "observed2_next3_gap1_binary": {"name": "f2", 'fpr_cap': 40},
     "observed3_next2_gap1_binary": {"name": "f2", 'fpr_cap': 40},
-    # "observed3_next3_gap1_binary": {'name': "f2", 'fpr_cap': 30},
-    # "observed3_next4_gap1_binary": {'name': "f2", 'fpr_cap': 30},
+    "observed3_next3_gap1_binary": {'name': "f2", 'fpr_cap': 40},
+    "observed3_next4_gap1_binary": {'name': "f2", 'fpr_cap': 40},
     "observed1_next1_binary": {'name':"f2"},
-    # "observed2_next1_binary": {'name':"f2"},
-    # "observed2_next2_binary": {'name':"f2"},
-    # "observed3_next2_binary": {'name':"f2"},
-    # "observed3_next3_binary": {'name':"f3", 'fpr_cap': 30},
+    "observed2_next1_binary": {'name':"f2"},
+    "observed2_next2_binary": {'name':"f2"},
+    "observed3_next2_binary": {'name':"f2"},
+    "observed3_next3_binary": {'name':"f3", 'fpr_cap': 40},
     "cond3of4_to_next4_ge2_binary": {'name': "f2", 'fpr_cap': 40},
     "cond3of5_to_next4_ge2_binary": {'name': "f2", 'fpr_cap': 40},
-    # "cond3of5_to_next5_ge3_binary": {'name': "f2", 'fpr_cap': 30},
+    "cond3of5_to_next5_ge3_binary": {'name': "f2", 'fpr_cap': 40},
 }
 
 
@@ -124,6 +125,7 @@ def pick_threshold(
     y_true: np.ndarray,
     p_hat: np.ndarray,
     policy: dict,
+    # default_fpr_cap: bool 
 ) -> tuple[float, dict[str, float]]:
     grid = np.linspace(0.05, 0.95, 91)
     rows = []
@@ -134,17 +136,22 @@ def pick_threshold(
         rows.append(st)
     cand = pd.DataFrame(rows)
 
-
-    row = cand.sort_values( [ policy['name'], "f1" ], ascending=False).iloc[0] 
+    policy_name = policy.get( "name" )
+    # if policy.get( "name" ) else default_policy[0]
+    policy_fpr_cap = policy.get("fpr_cap") 
     
-    if policy.get("fpr_cap") is not None:
+    # if policy.get("fpr_cap") else default_policy[1]   
+     
+    row = cand.sort_values( [ policy_name, "f1" ], ascending=False).iloc[0] 
+    
         # Support either fraction (0.30) or percent-style (30) caps.
-        cap = float(policy["fpr_cap"])
-        if cap > 1.0:
-            cap = cap / 100.0
-        cap = min(max(cap, 0.0), 1.0)
+    # cap = float(policy["fpr_cap"])
+    if policy_fpr_cap:
+        if policy_fpr_cap> 1.0:
+            policy_fpr_cap = policy_fpr_cap / 100.0
+        policy_fpr_cap = min(max(policy_fpr_cap, 0.0), 1.0)
 
-        below_cap = cand[cand["fpr"] <= cap]
+        below_cap = cand[cand["fpr"] <= policy_fpr_cap]
         if len(below_cap):
             row = below_cap.sort_values([policy["name"], "f1"], ascending=False).iloc[0]
         else:
@@ -164,7 +171,7 @@ def pick_threshold(
     #     raise ValueError(f"Unknown threshold policy: {policy}")
 
     return float(row["threshold"]), {
-        policy['name']: float(row[ policy['name']]),
+        policy_name: float(row[ policy_name ]),
         "f1": float(row["f1"]),
         "fpr": float(row["fpr"]),
         "tnr": float(row["tnr"]),
@@ -250,7 +257,7 @@ def encode_xgb(train_df: pd.DataFrame, other_df: pd.DataFrame, cat_cols: list[st
     return tr, ot
 
 
-def run_binary_strict_xgb(
+def run_binary_classifier_xgb(
     task: str,
     X: pd.DataFrame,
     y: pd.Series,
@@ -404,7 +411,7 @@ def run_binary_strict_xgb(
 
     metrics = {
         "task": task,
-        "type": "binary_strict_timecv_xgboost",
+        "type": "binary_classifier_timecv_xgboost",
         "cv_n_folds": int(len(folds)),
         "cv_mean_ap": float(best_cv_ap),
         "cv_std_ap": float(best_cv_ap_std),
@@ -481,7 +488,12 @@ def train_xgb_binary_tasks(
         
         policy = task_threshold_policy.get(spec.task)
         
-        metrics, model, pred_df, oof_df, cfg_df = run_binary_strict_xgb(
+        
+        ## roll-back to default policy if no policy is specified
+        if not policy:
+            policy =  {'name': cfg.threshold_policy_global_default, 'fpr_cap': cfg.threshold_fpr_cap_global_default } 
+        
+        metrics, model, pred_df, oof_df, cfg_df = run_binary_classifier_xgb(
             task=spec.task,
             X=spec.X,
             y=spec.y,

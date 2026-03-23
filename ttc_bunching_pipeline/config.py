@@ -79,8 +79,8 @@ class PipelineConfig:
     strict_cv_min_train_rows: int = 400
     strict_cv_min_valid_rows: int = 120
 
-    # threshold_policy: str = "f1_fprcap40"
-    # threshold_fpr_cap: float = 0.40
+    threshold_policy_global_default: str = "f2"
+    threshold_fpr_cap_global_default: float = 0.40
 
     xgb_params: list[dict] = field(
         default_factory=lambda: [
