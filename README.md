@@ -35,8 +35,9 @@ Our prediction model will essentially use three "layers" of features.
 
 - Third-order features: from ```contacts```, we will derive a third dataframe ```episodes```, built from the ```contacts``` dataframe. Each bunching incident (at a given stop) is either the start of a new bunching episode, or is the continuation of an existing bunching episode. These episodes are assigned an episode ID, and this dataframe tracks features such as how many stops the episode spans, how many minutes the episode has gone on for, and things of this nature.
 
-  - External features are also included. These include features related to distance to traffic signal and pedestrian crossings. We also include weather data, and data about active road permits near the streetcar stops. For distance based external features, we use the Haversine distance formula in order to accurately calculate distance between two geographic positions.
 
+
+- External features are also included. These include features related to distance to traffic signal and pedestrian crossings. We also include weather data, and data about active road permits near the streetcar stops. For distance based external features, we use the Haversine distance formula in order to accurately calculate distance between two geographic positions.
 
 - An incident dataframe ```incident_df``` is built from episode-level rows, then enriched with external features. For each configured risk-task (b,s,n,m), the pipeline adds task-specific target, eligibility (i.e. flagging episodes that are part of the specified risk-pattern). The dataframe ```incident_df``` is also used to calculate targets (primarily for training purposes). 
 
