@@ -51,7 +51,7 @@ Our prediction model will essentially use three "layers" of features.
 
 ## Chunked Event Data
 
-This folder stores chunked versions of the large event files used by the pipeline.
+The data_files folder contains chunked versions of the large event files used by the pipeline.
 All chunk files are kept below `45 MB` so they can be pushed to GitHub.
 
 ## Contents
