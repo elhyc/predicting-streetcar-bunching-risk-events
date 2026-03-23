@@ -2,7 +2,7 @@
 ## An ML approach to congestion on the TTC
 
 
- Heuristically, streetcars are "bunched" when a pair of streetcars arrive at a stop in quick succession. The scheduled headway between streetcars is the time gap between sucessive streetcars, according to a fixed schedule. A "bunching incident" happens when the observed headway between two streetcars in reality ends up being a time gap that is much lower than the scheduled headway. While there is not a strict definition of how much sooner than the scheduled headway counts as a "bunching incident", it should be calculated as the scheduled headway multiplied by some scale factor << $ 1$. Here, we take this scale factor to be $1/2$, so that a bunching incident occurs when a streetcar arrives at a stop sooner than 50% of the scheduled headway.
+ Heuristically, streetcars are "bunched" when a pair of streetcars arrive at a stop in quick succession. The scheduled headway between streetcars is the time gap between sucessive streetcars, according to a fixed schedule. A "bunching incident" happens when the observed headway between two streetcars in reality ends up being a time gap that is much lower than the scheduled headway. While there is not a strict definition of how much sooner than the scheduled headway counts as a "bunching incident", it should be calculated as the scheduled headway multiplied by some scale factor <<  1. Here, we take this scale factor to be $1/2$, so that a bunching incident occurs when a streetcar arrives at a stop sooner than 50% of the scheduled headway.
 
 ### <u> Bunching episodes </u> 
 
@@ -33,14 +33,17 @@ Our prediction model will essentially use three "layers" of features.
 
 - Second-order features: from ```ev``` we will derive another dataframe ```contacts```, which essentially extracts bunched pairs of streetcars from ```ev``` (across all stops and headways). This dataframe will include an entry for a pairs of streetcars whenever a new bunching episode has begun. That is, a pair of vehicle IDs may correspond to distinct rows of this dataframe, if the pair of vehicles have multiple non-contiguous bunching episodes. This dataframe also contains features relating to these bunched pairs (for example, the absolute difference between the schedule adherence features of the streetcars in the pair).
 
-- Third-order features: from ```contacts```, we will derive a third dataframe ```episodes```, built from the ```contacts``` dataframe. Each bunching incident (at a given stop) is either the start of a new bunching episode, or is the continuation of an existing bunching episode. These episodes are assigned an episode ID, and this dataframe tracks features such as how many stops the episode spans, how many minutes the episode has gone on for, and things of this nature. 
+- Third-order features: from ```contacts```, we will derive a third dataframe ```episodes```, built from the ```contacts``` dataframe. Each bunching incident (at a given stop) is either the start of a new bunching episode, or is the continuation of an existing bunching episode. These episodes are assigned an episode ID, and this dataframe tracks features such as how many stops the episode spans, how many minutes the episode has gone on for, and things of this nature.
+
+
+
+- External features are also included. These include features related to distance to traffic signal and pedestrian crossings. We also include weather data, and data about active road permits near the streetcar stops. For distance based external features, we use the Haversine distance formula in order to accurately calculate distance between two geographic positions.
 
 - An incident dataframe ```incident_df``` is built from episode-level rows, then enriched with external features. For each configured risk-task (b,s,n,m), the pipeline adds task-specific target, eligibility (i.e. flagging episodes that are part of the specified risk-pattern). The dataframe ```incident_df``` is also used to calculate targets (primarily for training purposes). 
 
 - The main feature dataframe that our models will be fit with is called ```incident_X```, which is a sub-dataframe of ```incident_df```, consisting of valid bunching episodes satisfying the current definition of "risk-pattern". 
 
 
-- External features are also included. These include features related to distance to traffic signal and pedestrian crossings. We also include weather data, and data about active road permits near the streetcar stops. For distance based external features, we use the Haversine distance formula in order to accurately calculate distance between two geographic positions.
 
 
 
@@ -48,7 +51,7 @@ Our prediction model will essentially use three "layers" of features.
 
 ## Chunked Event Data
 
-This folder stores chunked versions of the large event files used by the pipeline.
+The data_files folder contains chunked versions of the large event files used by the pipeline.
 All chunk files are kept below `45 MB` so they can be pushed to GitHub.
 
 ## Contents
